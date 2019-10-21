@@ -8,7 +8,7 @@ void EtapeUnCombattant()
     ENCODER_Reset(moteurDroit);
     ENCODER_Reset(moteurGauche);
 }
-
+//kjkjkjkj
 //---------------------------fonction secondaire-------------------------------
 
 ///////////////////////////////fonction get////////////////////////////////////
