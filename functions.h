@@ -15,3 +15,5 @@ void PID(float vitesse);
 
 int getDistanceEncodeur(float distanceEnCM);
 int getAngleEncodeur(float angleEnDegre); 
+
+uint16_t getDistanceInfrarouge(uint16_t rawInforInfrarouge);

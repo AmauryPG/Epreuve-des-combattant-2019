@@ -3,7 +3,7 @@
 //-----------------------main fonction de l'etape 1---------------------------
 void EtapeUnCombattant()
 {
-    //Chercher le mur le plus proche et tourne vers la direction 
+    //Chercher le mur le plus proche et tourne vers la direction
 }
 
 //---------------------------fonction secondaire-------------------------------
@@ -25,10 +25,20 @@ int getAngleEncodeur(float angleEnDegre)
     return getDistanceEncodeur((19.4) * PI * angleEnDegre / 360);
 }
 
+//retourne la distance en cm
+uint16_t getDistanceInfrarouge(uint16_t value)
+{
+    if (value < 10)
+    {
+        value = 10;
+    }
+    return (6762/(value-9))-4;
+}
+
 ///////////////////////////////fonction action////////////////////////////////////
 
 //trouve la ligne selon ses capteurs infrarouges
-////////////////////////////////////ERREUR POSSIBLE : les limites de l'infrarouge 
+////////////////////////////////////ERREUR POSSIBLE : les limites de l'infrarouge
 void TrouverLigne()
 {
     TournerSurPlace(ChercherMur(), 0.5);
@@ -39,7 +49,7 @@ void TrouverLigne()
 void PIDLigne(float vitesse)
 {
     int detecteurCouleur;
-    while (digitalRead(pinCapteurGauche)||digitalRead(pinCapteurMilieu)||digitalRead(pinCapteurDroit))
+    while (digitalRead(pinCapteurGauche) || digitalRead(pinCapteurMilieu) || digitalRead(pinCapteurDroit))
     {
         //PID();
     }
@@ -141,23 +151,14 @@ float kp = 0.00967;
 float ki = 0.00000004;
 float kd = 0.00496;
 
-float errorTl;
 float errorTr;
-float lastErrorL;
 float lastErrorR;
-float proportionL;
 float proportionR;
-float integralL;
 float integralR;
-float derivativeL;
 float derivativeR;
 
-float actualEncodor;
-float EncodorDesirL;
-float EncodorDesirR;
 float circ = 7.8;
 
-float speedL;
 float speedR;
 
 float integralActiveZone = 100;
@@ -166,72 +167,82 @@ void PID(float vitesse)
 {
     int quit = 1;
 
-    while(quit){
+    while (quit)
+    {
         int m;
-        //Avancer(getDistanceEncodeur(100),0.5);
-        //Serial.println(ROBUS_ReadIR(3));
-        if(Serial.available() > 0){
-            m=Serial.read();
-            if(m == 'q'){
-                kp+= 0.00001;
-            }else if(m == 'Q'){
-                kp-= 0.00001;
+        if (Serial.available() > 0)
+        {
+            m = Serial.read();
+            if (m == 'q')
+            {
+                kp += 0.00001;
             }
-            if(m == 'w'){
-                ki+= 0.00000001;
-            }else if(m == 'W'){
-                ki-= 0.00000001;
+            else if (m == 'Q')
+            {
+                kp -= 0.00001;
             }
-            if(m == 'e'){
-                kd+= 0.00001;
-            }else if(m == 'E'){
-                kd-= 0.00001;
+            if (m == 'w')
+            {
+                ki += 0.00000001;
             }
-            if(m == 'p'){
+            else if (m == 'W')
+            {
+                ki -= 0.00000001;
+            }
+            if (m == 'e')
+            {
+                kd += 0.00001;
+            }
+            else if (m == 'E')
+            {
+                kd -= 0.00001;
+            }
+            if (m == 'p')
+            {
                 quit = 0;
             }
         }
 
-    float errorR = ENCODER_Read(moteurGauche) - ENCODER_Read(moteurDroit);
+        float errorR = ENCODER_Read(moteurGauche) - ENCODER_Read(moteurDroit);
 
-    if (errorR < integralActiveZone && errorR != 0)
-    {
-        errorTr += errorR;
+        if (errorR < integralActiveZone && errorR != 0)
+        {
+            errorTr += errorR;
+        }
+        else
+        {
+            errorTr = 0;
+        }
+
+        if (errorTr > 10 / ki)
+        {
+            errorTr = 10 / ki;
+        }
+
+        if (errorR == 0)
+        {
+            derivativeR = 0;
+        }
+
+        proportionR = errorR * kp;
+
+        integralR = errorTr * ki;
+
+        derivativeR = (errorR - lastErrorR) * kd;
+
+        lastErrorR = errorR;
+
+        //motor
+        speedR = proportionR + integralR + derivativeR;
+
+        Serial.println(errorR);
+
+        MOTOR_SetSpeed(moteurGauche, vitesse);
+        MOTOR_SetSpeed(moteurDroit, vitesse + speedR);
+
+        delay(20);
     }
-    else
-    {
-        errorTr = 0;
-    } 
-
-    if (errorTr > 10 / ki)
-    {
-        errorTr = 10 / ki;
-    } 
-
-    if (errorR == 0)
-    {
-        derivativeR = 0;
-    }
- 
-    proportionR = errorR * kp;
- 
-    integralR = errorTr * ki;
- 
-    derivativeR = (errorR - lastErrorR) * kd;
- 
-    lastErrorR = errorR;
-
-    //motor
-    speedR = proportionR + integralR + derivativeR; 
-
-    Serial.println(errorR);
-
-    MOTOR_SetSpeed(moteurGauche, vitesse);
-    MOTOR_SetSpeed(moteurDroit, vitesse + speedR);
-
-    delay(20);
-    } 
-    Serial.println(kp,5);
-    Serial.println(ki,8);
-    Serial.println(kd,5);
+    Serial.println(kp, 5);
+    Serial.println(ki, 8);
+    Serial.println(kd, 5);
 }
