@@ -3,12 +3,9 @@
 //-----------------------main fonction de l'etape 1---------------------------
 void EtapeUnCombattant()
 {
-    //Chercher le mur le plus proche et tourne vers la direction
-    TournerSurPlace(ChercherLignePlusProche(), 0.4);
-    ENCODER_Reset(moteurDroit);
-    ENCODER_Reset(moteurGauche);
+    //Chercher le mur le plus proche et tourne vers la direction 
 }
-//kjkjkjkj
+
 //---------------------------fonction secondaire-------------------------------
 
 ///////////////////////////////fonction get////////////////////////////////////
@@ -29,6 +26,26 @@ int getAngleEncodeur(float angleEnDegre)
 }
 
 ///////////////////////////////fonction action////////////////////////////////////
+
+//trouve la ligne selon ses capteurs infrarouges
+////////////////////////////////////ERREUR POSSIBLE : les limites de l'infrarouge 
+void TrouverLigne()
+{
+    TournerSurPlace(ChercherMur(), 0.5);
+    PIDLigne(0.5);
+}
+
+//avance jusqu'a trouver la ligne
+void PIDLigne(float vitesse)
+{
+    int detecteurCouleur;
+    while (digitalRead(pinCapteurGauche)||digitalRead(pinCapteurMilieu)||digitalRead(pinCapteurDroit))
+    {
+        //PID();
+    }
+    MOTOR_SetSpeed(moteurGauche, 0);
+    MOTOR_SetSpeed(moteurDroit, 0);
+}
 
 //tourne sur place avec un angle et une vitesse
 void TournerSurPlace(float angleEnDegre, float vitesseSurUn)
@@ -59,7 +76,7 @@ void TournerSurPlace(float angleEnDegre, float vitesseSurUn)
 }
 
 //cherche le mur plus proche et retourne l'angle de ce mur
-int ChercherLignePlusProche()
+int ChercherMur()
 {
     int petiteDistance;
     int grandeDistance;
@@ -109,6 +126,7 @@ int ChercherLignePlusProche()
         }
     }
     //le plus 180 est pour commence ou le zero est
+    //============================================distance entre mur et ligne============================================
     if (petiteDistance < 45.72)
     {
         return petiteDistance + 180;
@@ -116,5 +134,104 @@ int ChercherLignePlusProche()
     else
     {
         return grandeDistance + 180;
+    }
+}
+
+float kp = 0.00967;
+float ki = 0.00000004;
+float kd = 0.00496;
+
+float errorTl;
+float errorTr;
+float lastErrorL;
+float lastErrorR;
+float proportionL;
+float proportionR;
+float integralL;
+float integralR;
+float derivativeL;
+float derivativeR;
+
+float actualEncodor;
+float EncodorDesirL;
+float EncodorDesirR;
+float circ = 7.8;
+
+float speedL;
+float speedR;
+
+float integralActiveZone = 100;
+
+void PID(float vitesse)
+{
+    int quit = 1;
+
+    while(quit){
+        int m;
+        //Avancer(getDistanceEncodeur(100),0.5);
+        //Serial.println(ROBUS_ReadIR(3));
+        if(Serial.available() > 0){
+            m=Serial.read();
+            if(m == 'q'){
+                kp+= 0.00001;
+            }else if(m == 'Q'){
+                kp-= 0.00001;
+            }
+            if(m == 'w'){
+                ki+= 0.00000001;
+            }else if(m == 'W'){
+                ki-= 0.00000001;
+            }
+            if(m == 'e'){
+                kd+= 0.00001;
+            }else if(m == 'E'){
+                kd-= 0.00001;
+            }
+            if(m == 'p'){
+                quit = 0;
+            }
+        }
+
+    float errorR = ENCODER_Read(moteurGauche) - ENCODER_Read(moteurDroit);
+
+    if (errorR < integralActiveZone && errorR != 0)
+    {
+        errorTr += errorR;
+    }
+    else
+    {
+        errorTr = 0;
     } 
+
+    if (errorTr > 10 / ki)
+    {
+        errorTr = 10 / ki;
+    } 
+
+    if (errorR == 0)
+    {
+        derivativeR = 0;
+    }
+ 
+    proportionR = errorR * kp;
+ 
+    integralR = errorTr * ki;
+ 
+    derivativeR = (errorR - lastErrorR) * kd;
+ 
+    lastErrorR = errorR;
+
+    //motor
+    speedR = proportionR + integralR + derivativeR; 
+
+    Serial.println(errorR);
+
+    MOTOR_SetSpeed(moteurGauche, vitesse);
+    MOTOR_SetSpeed(moteurDroit, vitesse + speedR);
+
+    delay(20);
+    } 
+    Serial.println(kp,5);
+    Serial.println(ki,8);
+    Serial.println(kd,5);
 }

@@ -1,5 +1,5 @@
 #include "functions.h"
- 
+
 void setup()
 {
   BoardInit();
@@ -8,18 +8,22 @@ void setup()
   pinMode(24, INPUT);
   pinMode(26, INPUT); 
 
+  pinMode(pinCapteurDroit, INPUT);
+  pinMode(pinCapteurMilieu, INPUT);
+  pinMode(pinCapteurGauche, INPUT);
+
+  Serial.begin(9600);
+
 }
 
 void loop()
 {
 
-  Serial.print(digitalRead(22));
-  Serial.print(" : ");
-  Serial.print(digitalRead(24));
-  Serial.print(" : ");
-  Serial.println(digitalRead(26));
-  //Serial.println(ROBUS_ReadIR(3));
-  delay(100);
+  PID(0.2); 
+  MOTOR_SetSpeed(moteurDroit,0);
+  MOTOR_SetSpeed(moteurGauche,0);
+  delay(5000);
+
 
   // 150mm : 648
   // 60 mm :  
