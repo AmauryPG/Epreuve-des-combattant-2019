@@ -26,23 +26,31 @@ int getAngleEncodeur(float angleEnDegre)
 }
 
 //retourne la distance en cm
-uint16_t getDistanceInfrarouge(uint16_t value)
+uint16_t getDistanceInfrarouge(uint16_t rawInfoInfrarouge)
 {
-    if (value < 10)
+    if (rawInfoInfrarouge < 10)
     {
-        value = 10;
+        rawInfoInfrarouge = 10;
     }
-    return (6762/(value-9))-4;
+    return (6762 / (rawInfoInfrarouge - 9)) - 4;
 }
 
 ///////////////////////////////fonction action////////////////////////////////////
+
+void AlignerLigne()
+{
+    //moitie du robot
+    PID(0.5, getDistanceEncodeur(10));
+    //tourner pour etre parallele a la ligne
+    TournerSurPlace(90, 0.3);
+}
 
 //trouve la ligne selon ses capteurs infrarouges
 ////////////////////////////////////ERREUR POSSIBLE : les limites de l'infrarouge
 void TrouverLigne()
 {
     TournerSurPlace(ChercherMur(), 0.5);
-    PIDLigne(0.5);
+    PIDLigne(-0.5);
 }
 
 //avance jusqu'a trouver la ligne
@@ -90,6 +98,8 @@ int ChercherMur()
 {
     int petiteDistance;
     int grandeDistance;
+    int grandAngle;
+    int petitAngle;
 
     //initialise la valeur initial de direction
     if (ROBUS_ReadIR(3) > ROBUS_ReadIR(2))
@@ -115,11 +125,13 @@ int ChercherMur()
             if (petiteDistance > ROBUS_ReadIR(2))
             {
                 petiteDistance = ROBUS_ReadIR(2);
+                petitAngle = angle;
             }
 
             if (grandeDistance < ROBUS_ReadIR(2))
             {
                 grandeDistance = ROBUS_ReadIR(2);
+                grandAngle = angle;
             }
         }
         else
@@ -127,23 +139,25 @@ int ChercherMur()
             if (petiteDistance > ROBUS_ReadIR(3))
             {
                 petiteDistance = ROBUS_ReadIR(3);
+                petitAngle = angle;
             }
 
             if (grandeDistance < ROBUS_ReadIR(3))
             {
                 grandeDistance = ROBUS_ReadIR(3);
+                grandAngle = angle;
             }
         }
     }
     //le plus 180 est pour commence ou le zero est
     //============================================distance entre mur et ligne============================================
-    if (petiteDistance < 45.72)
+    if (petiteDistance < getDistanceInfrarouge(46))
     {
-        return petiteDistance + 180;
+        return petitAngle + 180;
     }
     else
     {
-        return grandeDistance + 180;
+        return grandAngle + 180;
     }
 }
 
@@ -163,11 +177,11 @@ float speedR;
 
 float integralActiveZone = 100;
 
-void PID(float vitesse)
+void PID(float vitesse, int distance)
 {
     int quit = 1;
 
-    while (quit)
+    while (quit && distance < ENCODER_Read(moteurGauche))
     {
         int m;
         if (Serial.available() > 0)
@@ -214,9 +228,9 @@ void PID(float vitesse)
             errorTr = 0;
         }
 
-        if (errorTr > 10 / ki)
+        if (errorTr > 70 / ki)
         {
-            errorTr = 10 / ki;
+            errorTr = 70 / ki;
         }
 
         if (errorR == 0)
@@ -240,9 +254,59 @@ void PID(float vitesse)
         MOTOR_SetSpeed(moteurGauche, vitesse);
         MOTOR_SetSpeed(moteurDroit, vitesse + speedR);
 
-        delay(20);
+        delay(10);
     }
     Serial.println(kp, 5);
     Serial.println(ki, 8);
     Serial.println(kd, 5);
+}
+
+void PIDSuiveurLigne(float vitesse)
+{
+
+    float erreur = 1;
+    int quit = 1;
+
+    while (pinCapteurDroit || pinCapteurGauche || pinCapteurMilieu)
+    {
+
+        float errorR = !pinCapteurMilieu - pinCapteurDroit - pinCapteurGauche * 2;
+
+        if (errorR < integralActiveZone && errorR != 0)
+        {
+            errorTr += errorR;
+        }
+        else
+        {
+            errorTr = 0;
+        }
+
+        if (errorTr > 70 / ki)
+        {
+            errorTr = 70 / ki;
+        }
+
+        if (errorR == 0)
+        {
+            derivativeR = 0;
+        }
+
+        proportionR = errorR * kp;
+
+        integralR = errorTr * ki;
+
+        derivativeR = (errorR - lastErrorR) * kd;
+
+        lastErrorR = errorR;
+
+        //motor
+        speedR = proportionR + integralR + derivativeR;
+
+        Serial.println(errorR);
+
+        MOTOR_SetSpeed(moteurGauche, vitesse);
+        MOTOR_SetSpeed(moteurDroit, vitesse + speedR);
+
+        delay(10);
+    }
 }
