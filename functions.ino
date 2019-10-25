@@ -1,5 +1,13 @@
 #include "functions.h"
 
+const int distributionZone[][2] = {{0, 1},
+                                   {2, 3}};
+
+//zone0, zone1, zone 2, zone 3
+const int bleuZone[] = {0, 0, 0, 0};
+const int vertZone[] = {0, 0, 0, 0};
+const int rougeZone[] = {0, 0, 0, 0};
+
 //-----------------------main fonction de l'etape 1---------------------------
 void EtapeUnCombattant()
 {
@@ -35,12 +43,62 @@ uint16_t getDistanceInfrarouge(uint16_t rawInfoInfrarouge)
     return (6762 / (rawInfoInfrarouge - 9)) - 4;
 }
 
+//retourne 1 si la variable est dans la tolerence
+int isTolerance(float input, float limite, float tolerance)
+{
+    return (input <= (limite + tolerance) && input >= (limite + tolerance));
+}
+
+int isTolerance(float input, float limite, float tolerancePositive, float toleranceNegative)
+{
+    return (input <= (limite + tolerancePositive) && input >= (limite - toleranceNegative));
+}
+
+//retourne 1 si le capteur est dans la bonne couleur
+int isZone(int rouge, int bleu, int vert, Adafruit_TCS34725 tcs, int tolerance)
+{
+    uint16_t clear, rougeRef, vertRef, bleuRef;
+
+    tcs.setInterrupt(false); // turn on LED
+
+    delay(60); // takes 50ms to read
+
+    tcs.getRawData(&rougeRef, &vertRef, &bleuRef, &clear);
+
+    return (isTolerance(rouge, rougeRef, tolerance) && isTolerance(bleu, bleuRef, tolerance) && isTolerance(vert, vertRef, tolerance));
+}
+
 ///////////////////////////////fonction action////////////////////////////////////
 
+void ChercherZoneComplexe(Adafruit_TCS34725 tcs)
+{
+    AlignerLigne();
+
+    do
+    {
+        PIDSuiveurLigne(0.5);
+    } while (isZone(rougeZone[0], bleuZone[0], vertZone[0], tcs, 10) || isZone(rougeZone[1], bleuZone[1], vertZone[1], tcs, 10) || isZone(rougeZone[2], bleuZone[2], vertZone[2], tcs, 10) || isZone(rougeZone[3], bleuZone[3], vertZone[3], tcs, 10));
+
+    //avancer un peu pour etre au milieu de la zone
+
+    if (isZone(rougeZone[bonneZone], bleuZone[bonneZone], vertZone[bonneZone], tcs, 10))
+    {
+        //trouver la bonne zone
+        //AttraperBalle();
+    }
+    else
+    {
+        TournerSurPlace(180, 0.3);
+        TournerSurPlace(45, 0.3);
+        TournerSurPlace(90, 0.3);
+    }
+}
+
+//aligner le robot avec la ligne
 void AlignerLigne()
 {
     //moitie du robot
-    PID(0.5, getDistanceEncodeur(10));
+    // PID(0.5, getDistanceEncodeur(10));
     //tourner pour etre parallele a la ligne
     TournerSurPlace(90, 0.3);
 }
@@ -161,6 +219,7 @@ int ChercherMur()
     }
 }
 
+/*
 float kp = 0.00967;
 float ki = 0.00000004;
 float kd = 0.00496;
@@ -260,53 +319,57 @@ void PID(float vitesse, int distance)
     Serial.println(ki, 8);
     Serial.println(kd, 5);
 }
+*/
+
+double kp = 0.010;
+double ki = 0.0000001;
+double kd = 0.018;
+
+unsigned long currentTime, previousTime;
+double elapsedTime;
+double error;
+double lastError;
+double input, output, setPoint;
+double TotalError, rateError;
+
+void PIDMotor(double vitesse)
+{
+    currentTime = millis();                             //get current time
+    elapsedTime = (double)(currentTime - previousTime); //compute time elapsed from previous computation
+
+    error = ENCODER_Read(moteurGauche) - ENCODER_Read(moteurDroit); // determine error
+    TotalError += error * elapsedTime;                              // compute integral
+    rateError = (error - lastError) / elapsedTime;                  // compute derivative
+
+    double out = kp * error + ki * TotalError + kd * rateError; //PID output
+
+    lastError = error;          //remember current error
+    previousTime = currentTime; //remember current time
+
+    MOTOR_SetSpeed(moteurDroit, out);
+    MOTOR_SetSpeed(moteurGauche, vitesse);
+    delay(5); //delay for the motors
+}
+
+double Kp = 0.010;
+double Ki = 0.0000001;
+double Kd = 0.018;
 
 void PIDSuiveurLigne(float vitesse)
 {
+    currentTime = millis();                             //get current time
+    elapsedTime = (double)(currentTime - previousTime); //compute time elapsed from previous computation
 
-    float erreur = 1;
-    int quit = 1;
+    error = digitalRead(pinCapteurMilieu) - 2 * digitalRead(pinCapteurGauche) - 4 * digitalRead(pinCapteurDroit); // determine error
+    TotalError += error * elapsedTime;                                                                            // compute integral
+    rateError = (error - lastError) / elapsedTime;                                                                // compute derivative
 
-    while (pinCapteurDroit || pinCapteurGauche || pinCapteurMilieu)
-    {
+    double out = Kp * error + Ki * TotalError + Kd * rateError; //PID output
 
-        float errorR = !pinCapteurMilieu - pinCapteurDroit - pinCapteurGauche * 2;
+    lastError = error;          //remember current error
+    previousTime = currentTime; //remember current time
 
-        if (errorR < integralActiveZone && errorR != 0)
-        {
-            errorTr += errorR;
-        }
-        else
-        {
-            errorTr = 0;
-        }
-
-        if (errorTr > 70 / ki)
-        {
-            errorTr = 70 / ki;
-        }
-
-        if (errorR == 0)
-        {
-            derivativeR = 0;
-        }
-
-        proportionR = errorR * kp;
-
-        integralR = errorTr * ki;
-
-        derivativeR = (errorR - lastErrorR) * kd;
-
-        lastErrorR = errorR;
-
-        //motor
-        speedR = proportionR + integralR + derivativeR;
-
-        Serial.println(errorR);
-
-        MOTOR_SetSpeed(moteurGauche, vitesse);
-        MOTOR_SetSpeed(moteurDroit, vitesse + speedR);
-
-        delay(10);
-    }
+    MOTOR_SetSpeed(moteurDroit, out);
+    MOTOR_SetSpeed(moteurGauche, vitesse);
+    delay(5); //delay for the motors
 }
