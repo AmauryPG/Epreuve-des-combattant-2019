@@ -35,33 +35,37 @@ uint16_t getDistanceInfrarouge(uint16_t rawInfoInfrarouge)
     return (6762 / (rawInfoInfrarouge - 9)) - 4;
 }
 
-
 int Conv_DigitalAnalog() // Conversion Digital -> Analog
 {
-    int Value_CapteurG,Value_CapteurD,Value_CapteurM, Value_SumCapteur;
+    int Value_CapteurG, Value_CapteurD, Value_CapteurM, Value_SumCapteur;
 
-    if(digitalRead(pinCapteurGauche)==0){
-        Value_CapteurG=2;
+    if (digitalRead(pinCapteurGauche) == 0)
+    {
+        Value_CapteurG = 2;
     }
-    else{
-        Value_CapteurG=0;
+    else
+    {
+        Value_CapteurG = 0;
     }
-    if(digitalRead(pinCapteurMilieu)==0){
-        Value_CapteurM=4;
+    if (digitalRead(pinCapteurMilieu) == 0)
+    {
+        Value_CapteurM = 4;
     }
-    else{
-        Value_CapteurM=0;
+    else
+    {
+        Value_CapteurM = 0;
     }
-    if(digitalRead(pinCapteurDroit)==0){
-        Value_CapteurD=8;
+    if (digitalRead(pinCapteurDroit) == 0)
+    {
+        Value_CapteurD = 8;
     }
-    else{
-        Value_CapteurD=0;
+    else
+    {
+        Value_CapteurD = 0;
     }
     Value_SumCapteur = Value_CapteurG + Value_CapteurM + Value_CapteurD;
     return Value_SumCapteur;
 }
-
 
 ///////////////////////////////fonction action////////////////////////////////////
 
@@ -74,44 +78,48 @@ void AlignerLigne()
 }
 
 void SuiveurLigne() // Prototype #1 du suiveur de ligne
-{ 
+{
     switch (Conv_DigitalAnalog())
     {
-        case 2:
-            MOTOR_SetSpeed(moteurDroit,-1);
-            MOTOR_SetSpeed(moteurGauche,-0.5);
-            Serial.println("case 2");
-        case 4:
-            MOTOR_SetSpeed(moteurDroit,-0.75);
-            MOTOR_SetSpeed(moteurGauche,-0.75);
-            Serial.println("case 4");
-        case 6:
-            MOTOR_SetSpeed(moteurDroit,-0.75);
-            MOTOR_SetSpeed(moteurGauche,-0.5);
-            Serial.println("case 6");
-        case 8:
-            MOTOR_SetSpeed(moteurGauche,-1);
-            MOTOR_SetSpeed(moteurDroit,-0.5);
-            Serial.println("case 8");
-        case 12:
-            MOTOR_SetSpeed(moteurGauche,-0.75);
-            MOTOR_SetSpeed(moteurDroit,-0.5);
-            Serial.println("case 12");
-        case 14:
-            MOTOR_SetSpeed(moteurDroit,0);
-            MOTOR_SetSpeed(moteurGauche,0);
-            Serial.println("case 14");
-       
+    case 2:
+        MOTOR_SetSpeed(moteurDroit, -1);
+        MOTOR_SetSpeed(moteurGauche, -0.5);
+        Serial.println("case 2");
         break;
-    
-        default:
-            MOTOR_SetSpeed(moteurDroit,-0.2);
-            MOTOR_SetSpeed(moteurGauche,-0.2);
-            Serial.println("Default Value_SumCapteur");
+    case 4:
+        MOTOR_SetSpeed(moteurDroit, -0.75);
+        MOTOR_SetSpeed(moteurGauche, -0.75);
+        Serial.println("case 4");
+        break;
+    case 6:
+        MOTOR_SetSpeed(moteurDroit, -0.75);
+        MOTOR_SetSpeed(moteurGauche, -0.5);
+        Serial.println("case 6");
+        break;
+    case 8:
+        MOTOR_SetSpeed(moteurGauche, -1);
+        MOTOR_SetSpeed(moteurDroit, -0.5);
+        Serial.println("case 8");
+        break;
+    case 12:
+        MOTOR_SetSpeed(moteurGauche, -0.75);
+        MOTOR_SetSpeed(moteurDroit, -0.5);
+        Serial.println("case 12");
+        break;
+    case 14:
+        MOTOR_SetSpeed(moteurDroit, 0);
+        MOTOR_SetSpeed(moteurGauche, 0);
+        Serial.println("case 14");
+
+        break;
+
+    default:
+        MOTOR_SetSpeed(moteurDroit, -0.2);
+        MOTOR_SetSpeed(moteurGauche, -0.2);
+        Serial.println("Default Value_SumCapteur");
         break;
     }
 }
-
 
 ////////////////////////////////////ERREUR POSSIBLE : les limites de l'infrarouge
 void TrouverLigne() //trouve la ligne selon ses capteurs infrarouges
