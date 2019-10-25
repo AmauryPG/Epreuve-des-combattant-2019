@@ -276,3 +276,14 @@ void PIDSuiveurLigne(float vitesse)
     MOTOR_SetSpeed(moteurGauche, vitesse);
     delay(5); //delay for the motors
 }
+
+void PIDacceleration(float vitesseInitial, float vitesseFinale, float distanceCM)
+{
+    float acceleration = (pow(vitesseFinale, 2) - pow(vitesseInitial, 2)) / (2 * getDistanceEncodeur(distanceCM));
+    int temps = 1;
+    do
+    {
+        PIDMotor(vitesseInitial + acceleration * temps);
+        temps++;
+    } while (vitesseInitial + acceleration * temps <= vitesseFinale);
+}

@@ -24,6 +24,6 @@ void setup()
 
 void loop()
 { 
-  PIDMotor(0.2);
+  PIDacceleration(0,0.5,10);
   delay(10);
 }
