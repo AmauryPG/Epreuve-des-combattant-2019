@@ -219,108 +219,6 @@ int ChercherMur()
     }
 }
 
-/*
-float kp = 0.00967;
-float ki = 0.00000004;
-float kd = 0.00496;
-
-float errorTr;
-float lastErrorR;
-float proportionR;
-float integralR;
-float derivativeR;
-
-float circ = 7.8;
-
-float speedR;
-
-float integralActiveZone = 100;
-
-void PID(float vitesse, int distance)
-{
-    int quit = 1;
-
-    while (quit && distance < ENCODER_Read(moteurGauche))
-    {
-        int m;
-        if (Serial.available() > 0)
-        {
-            m = Serial.read();
-            if (m == 'q')
-            {
-                kp += 0.00001;
-            }
-            else if (m == 'Q')
-            {
-                kp -= 0.00001;
-            }
-            if (m == 'w')
-            {
-                ki += 0.00000001;
-            }
-            else if (m == 'W')
-            {
-                ki -= 0.00000001;
-            }
-            if (m == 'e')
-            {
-                kd += 0.00001;
-            }
-            else if (m == 'E')
-            {
-                kd -= 0.00001;
-            }
-            if (m == 'p')
-            {
-                quit = 0;
-            }
-        }
-
-        float errorR = ENCODER_Read(moteurGauche) - ENCODER_Read(moteurDroit);
-
-        if (errorR < integralActiveZone && errorR != 0)
-        {
-            errorTr += errorR;
-        }
-        else
-        {
-            errorTr = 0;
-        }
-
-        if (errorTr > 70 / ki)
-        {
-            errorTr = 70 / ki;
-        }
-
-        if (errorR == 0)
-        {
-            derivativeR = 0;
-        }
-
-        proportionR = errorR * kp;
-
-        integralR = errorTr * ki;
-
-        derivativeR = (errorR - lastErrorR) * kd;
-
-        lastErrorR = errorR;
-
-        //motor
-        speedR = proportionR + integralR + derivativeR;
-
-        Serial.println(errorR);
-
-        MOTOR_SetSpeed(moteurGauche, vitesse);
-        MOTOR_SetSpeed(moteurDroit, vitesse + speedR);
-
-        delay(10);
-    }
-    Serial.println(kp, 5);
-    Serial.println(ki, 8);
-    Serial.println(kd, 5);
-}
-*/
-
 double kp = 0.010;
 double ki = 0.0000001;
 double kd = 0.018;
@@ -329,7 +227,6 @@ unsigned long currentTime, previousTime;
 double elapsedTime;
 double error;
 double lastError;
-double input, output, setPoint;
 double TotalError, rateError;
 
 void PIDMotor(double vitesse)
@@ -355,19 +252,25 @@ double Kp = 0.010;
 double Ki = 0.0000001;
 double Kd = 0.018;
 
+unsigned long currentTime2, previousTime2;
+double elapsedTime2;
+double error2;
+double lastError2;
+double TotalError2, rateError2;
+
 void PIDSuiveurLigne(float vitesse)
 {
-    currentTime = millis();                             //get current time
-    elapsedTime = (double)(currentTime - previousTime); //compute time elapsed from previous computation
+    currentTime2 = millis();                               //get current time
+    elapsedTime2 = (double)(currentTime2 - previousTime2); //compute time elapsed from previous computation
 
-    error = digitalRead(pinCapteurMilieu) - 2 * digitalRead(pinCapteurGauche) - 4 * digitalRead(pinCapteurDroit); // determine error
-    TotalError += error * elapsedTime;                                                                            // compute integral
-    rateError = (error - lastError) / elapsedTime;                                                                // compute derivative
+    error2 = digitalRead(pinCapteurMilieu) - 2 * digitalRead(pinCapteurGauche) - 4 * digitalRead(pinCapteurDroit); // determine error
+    TotalError2 += error2 * elapsedTime2;                                                                          // compute integral
+    rateError2 = (error2 - lastError2) / elapsedTime2;                                                             // compute derivative
 
-    double out = Kp * error + Ki * TotalError + Kd * rateError; //PID output
+    double out = Kp * error2 + Ki * TotalError2 + Kd * rateError2; //PID output
 
-    lastError = error;          //remember current error
-    previousTime = currentTime; //remember current time
+    lastError2 = error2;          //remember current error
+    previousTime2 = currentTime2; //remember current time
 
     MOTOR_SetSpeed(moteurDroit, out);
     MOTOR_SetSpeed(moteurGauche, vitesse);
