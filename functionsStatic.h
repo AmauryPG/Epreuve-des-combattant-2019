@@ -9,8 +9,6 @@
 #define pinCapteurMilieu 1
 #define pinCapteurDroit 1
 
-#define bonneZone 0
-
 int getDistanceEncodeur(float distanceEnCM);
 int getAngleEncodeur(float angleEnDegre);
 

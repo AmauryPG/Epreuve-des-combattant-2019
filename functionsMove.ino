@@ -1,15 +1,30 @@
 #include "functionsMove.h"
 
-const int distributionZone[][2] = {{0, 1},
-                                   {2, 3}};
-
-//zone0, zone1, zone 2, zone 3
-const int bleuZone[] = {0, 0, 0, 0};
-const int vertZone[] = {0, 0, 0, 0};
-const int rougeZone[] = {0, 0, 0, 0};
+int zones = 0;
 
 ///////////////////////////////fonction action////////////////////////////////////
 
+void ChercherBalle()
+{
+    //distribution des zones
+    //0         1
+    //   robot
+    //2         3
+
+    switch (zones)
+    {
+    case 0:
+        break;
+    case 1:
+        break;
+    case 2:
+        break;
+    case 3:
+        break;
+    }
+}
+
+/*
 void ChercherZoneComplexe(Adafruit_TCS34725 tcs)
 {
     AlignerLigne();
@@ -32,7 +47,7 @@ void ChercherZoneComplexe(Adafruit_TCS34725 tcs)
         TournerSurPlace(45, 0.3);
         TournerSurPlace(90, 0.3);
     }
-}
+}*/
 
 //aligner le robot avec la ligne
 void AlignerLigne()
@@ -203,7 +218,7 @@ void PIDSuiveurLigne(float vitesse)
     currentTime2 = millis();                               //get current time
     elapsedTime2 = (double)(currentTime2 - previousTime2); //compute time elapsed from previous computation
 
-    error2 = digitalRead(pinCapteurMilieu) - 2 * digitalRead(pinCapteurGauche) - 4 * digitalRead(pinCapteurDroit); // determine error
+    error2 = digitalRead(pinCapteurMilieu) - digitalRead(pinCapteurGauche) - digitalRead(pinCapteurDroit); // determine error
     TotalError2 += error2 * elapsedTime2;                                                                          // compute integral
     rateError2 = (error2 - lastError2) / elapsedTime2;                                                             // compute derivative
 
