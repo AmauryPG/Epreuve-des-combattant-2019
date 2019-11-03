@@ -39,7 +39,7 @@ int Conv_DigitalAnalog() // Conversion Digital -> Analog
 {
     int Value_CapteurG, Value_CapteurD, Value_CapteurM, Value_SumCapteur;
 
-    if (digitalRead(pinCapteurGauche) == 0)
+    if (digitalRead(pinCapteurGauche) == 1)
     {
         Value_CapteurG = 2;
     }
@@ -47,7 +47,7 @@ int Conv_DigitalAnalog() // Conversion Digital -> Analog
     {
         Value_CapteurG = 0;
     }
-    if (digitalRead(pinCapteurMilieu) == 0)
+    if (digitalRead(pinCapteurMilieu) == 1)
     {
         Value_CapteurM = 4;
     }
@@ -55,7 +55,7 @@ int Conv_DigitalAnalog() // Conversion Digital -> Analog
     {
         Value_CapteurM = 0;
     }
-    if (digitalRead(pinCapteurDroit) == 0)
+    if (digitalRead(pinCapteurDroit) == 1)
     {
         Value_CapteurD = 8;
     }
@@ -82,28 +82,28 @@ void SuiveurLigne() // Prototype #1 du suiveur de ligne
     switch (Conv_DigitalAnalog())
     {
     case 2:
-        MOTOR_SetSpeed(moteurDroit, -1);
-        MOTOR_SetSpeed(moteurGauche, -0.5);
+        MOTOR_SetSpeed(moteurDroit, -0.6);
+        MOTOR_SetSpeed(moteurGauche, -0.3);
         Serial.println("case 2");
         break;
     case 4:
-        MOTOR_SetSpeed(moteurDroit, -0.75);
-        MOTOR_SetSpeed(moteurGauche, -0.75);
+        MOTOR_SetSpeed(moteurDroit, -0.6);
+        MOTOR_SetSpeed(moteurGauche, -0.6);
         Serial.println("case 4");
         break;
     case 6:
-        MOTOR_SetSpeed(moteurDroit, -0.75);
-        MOTOR_SetSpeed(moteurGauche, -0.5);
+        MOTOR_SetSpeed(moteurDroit, -0.6);
+        MOTOR_SetSpeed(moteurGauche, -0.4);
         Serial.println("case 6");
         break;
     case 8:
-        MOTOR_SetSpeed(moteurGauche, -1);
-        MOTOR_SetSpeed(moteurDroit, -0.5);
+        MOTOR_SetSpeed(moteurGauche, -0.6);
+        MOTOR_SetSpeed(moteurDroit, -0.3);
         Serial.println("case 8");
         break;
     case 12:
-        MOTOR_SetSpeed(moteurGauche, -0.75);
-        MOTOR_SetSpeed(moteurDroit, -0.5);
+        MOTOR_SetSpeed(moteurGauche, -0.6);
+        MOTOR_SetSpeed(moteurDroit, -0.4);
         Serial.println("case 12");
         break;
     case 14:
