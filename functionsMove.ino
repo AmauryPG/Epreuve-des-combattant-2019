@@ -98,7 +98,10 @@ void PIDAcceleration(float vitesseInitial, float vitesseFinale, float distanceCM
 void PIDAvancer(float vitesseInitial, float vitesseFinale, float distanceCM, float distanceAcceleration)
 { 
     PIDAcceleration(vitesseInitial,vitesseFinale,distanceAcceleration);
-    PID(vitesseFinale,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
+    while(ENCODER_Read(moteurGauche) < getDistanceEncodeur(distanceCM))
+    {
+        PID(vitesseFinale,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
+    }
 }
 
 void PinceOpen()
@@ -158,6 +161,9 @@ void ChercherBalle()
         {
             PID(vitesse,digitalRead(pinCapteurMilieu),(digitalRead(pinCapteurGauche)+digitalRead(pinCapteurDroit)));
         }
+        
+
+        PIDAvancer(vitesse,vitesse,(44.58+20,32),0);
  
         break;
     case 2:
