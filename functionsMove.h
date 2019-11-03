@@ -1,8 +1,10 @@
 #include "functionsStatic.h"
 
-void EtapeUnCombattant();
-void TournerSurPlace(float angleEnDegre, float vitesseSurUn);
-void Avancer(float distance, float vitesse);
-void PIDMotor(double vitesse);
-void PIDSuiveurLigne(float vitesse);
-void PIDacceleration(float vitesseInitial, float vitesseFinale, float distance);
+void PinceClose();
+void PinceOpen();
+
+void PID(double vitesse, double setPoint, double variable);
+void PIDAvancer(float vitesseInitial, float vitesseFinale, float distanceCM, float distanceAcceleration);
+void PIDAcceleration(float vitesseInitial, float vitesseFinale, float distanceCM);
+
+void TournerSurPlace(float angleEnDegreCercle, float vitesse);

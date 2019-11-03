@@ -16,39 +16,6 @@ double kd = 0.018;
 
 float vitesse = 0.5;
 
-void ChercherBalle()
-{
-    //distribution des zones
-    //0         1
-    //   robot
-    //2         3
-
-    switch (zones)
-    {
-    case 0:
-
-        break;
-    case 1:
-        //tourner 90 degre
-        TournerSurPlace(90,vitesse);
-
-        //avancer jusqu'a la ligne
-        PIDAcceleration(0,vitesse,10);
-        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
-        {
-            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
-        }
-
-        //tourner 90 degre
-        TournerSurPlace(270,vitesse);
-        break;
-    case 2:
-        break;
-    case 3:
-        break;
-    }
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////fonction action////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,20 +93,76 @@ void PIDAcceleration(float vitesseInitial, float vitesseFinale, float distanceCM
         vitesseModifier = vitesseInitial + acceleration * temps;
     } 
 }
+ 
 
-float ratioAcceleration = 0.2;
-
-void PIDAvancer(float vitesseInitial, float vitesseFinale, float distanceCM)
-{
-    float distanceAcceleration = ratioAcceleration * distanceCM;
-    distanceCM = (1-ratioAcceleration) * distanceCM;
-
+void PIDAvancer(float vitesseInitial, float vitesseFinale, float distanceCM, float distanceAcceleration)
+{ 
     PIDAcceleration(vitesseInitial,vitesseFinale,distanceAcceleration);
     PID(vitesseFinale,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
 }
 
-void Pince()
+void PinceOpen()
+{ 
+    SERVO_Enable(1);
+    delay(10);
+    SERVO_SetAngle(1, 180);
+    delay(10); 
+}
+
+void PinceClose()
 {
+  SERVO_Enable(1);
+  delay(10);
+  SERVO_SetAngle(1, 145);
+  delay(10);
+}
 
+/****************************************************************************************
+ *                              fonctions principaux
+****************************************************************************************/
+void ChercherBalle()
+{
+    //distribution des zones
+    //0         1
+    //   robot
+    //2         3
 
+    switch (zones)
+    {
+    case 0:
+
+        break;
+    case 1:
+        //tourner 90 degre
+        TournerSurPlace(90,vitesse);
+
+        //avancer jusqu'a la ligne
+        PIDAcceleration(0,vitesse,5);
+        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
+        {
+            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
+        }
+
+        //tourner 90 degre
+        TournerSurPlace(-90,vitesse);
+
+        //avancer jusqu'a la ligne
+        PIDAcceleration(0,vitesse,5);
+        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
+        {
+            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
+        }
+        
+        //suiveur de ligne
+        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
+        {
+            PID(vitesse,digitalRead(pinCapteurMilieu),(digitalRead(pinCapteurGauche)+digitalRead(pinCapteurDroit)));
+        }
+ 
+        break;
+    case 2:
+        break;
+    case 3:
+        break;
+    }
 }
