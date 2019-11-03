@@ -163,7 +163,7 @@ void ChercherBalle()
         }
         
 
-        PIDAvancer(vitesse,vitesse,(44.58+20,32),0);
+        PIDAvancer(vitesse,vitesse,64.9,0);
  
         break;
     case 2:
