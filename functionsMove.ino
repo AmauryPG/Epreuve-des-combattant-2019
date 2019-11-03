@@ -3,8 +3,8 @@
 int zones = 0;
 
 //               pour le robot A
-double kp = 0.010;
-double ki = 0.0000001;
+double kp = 0.001;
+double ki = 0.000002;
 double kd = 0.018;  
 
 //               pour le robot B
@@ -81,7 +81,17 @@ void PID(double vitesse, double setPoint, double variable)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////ERREUR DE DIMENSION
 void PIDAcceleration(float vitesseInitial, float vitesseFinale, float distanceCM)
 {
-    float acceleration = (pow(vitesseFinale, 2) - pow(vitesseInitial, 2)) / (2 * getDistanceEncodeur(distanceCM));
+    /****
+     * x   | y
+     * 100 | 109
+     * 95  | 53
+     * 90  | 52
+     * 70  | 50
+     * 50  | 50
+     * 25  | 48
+    */
+    float constante = ((-24.5407)/(distanceCM - 100.408)) + 48.8973;
+    float acceleration = constante *((pow(vitesseFinale, 2) - pow(vitesseInitial, 2)) / (2 * getDistanceEncodeur(distanceCM)));
     int temps = 1;
     float vitesseModifier = vitesseInitial + acceleration * temps;
 
@@ -89,6 +99,9 @@ void PIDAcceleration(float vitesseInitial, float vitesseFinale, float distanceCM
     {
         //moteur droit est slave et gauche est master
         PID(vitesseModifier, ENCODER_Read(moteurGauche), ENCODER_Read(moteurDroit));
+
+        //Serial.println(vitesseModifier,7);
+
         temps++;
         vitesseModifier = vitesseInitial + acceleration * temps;
     } 
@@ -161,9 +174,6 @@ void ChercherBalle()
         {
             PID(vitesse,digitalRead(pinCapteurMilieu),(digitalRead(pinCapteurGauche)+digitalRead(pinCapteurDroit)));
         }
-        
-
-        PIDAvancer(vitesse,vitesse,64.9,0);
  
         break;
     case 2:

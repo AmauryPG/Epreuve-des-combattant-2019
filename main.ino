@@ -9,6 +9,9 @@ void setup()
 
 void loop()
 { 
-  PIDAcceleration(0,0.5,10);
+  PIDAcceleration(0.0, 0.3,30);
+  MOTOR_SetSpeed(0,0);
+  MOTOR_SetSpeed(1,0);
+  delay(5000);
   delay(10);
 }
