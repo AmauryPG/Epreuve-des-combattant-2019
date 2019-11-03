@@ -1,7 +1,5 @@
 #include "functionsMove.h"
 
-int zones = 0;
-
 //               pour le robot A
 double kp = 0.010;
 double ki = 0.0000001;
@@ -123,14 +121,14 @@ void PinceClose()
 /****************************************************************************************
  *                              fonctions principaux
 ****************************************************************************************/
-void ChercherBalle()
+void ChercherBalle(int zone)
 {
     //distribution des zones
     //0         1
     //   robot
     //2         3
 
-    switch (zones)
+    switch (zone)
     {
     case 0:
 
@@ -162,9 +160,30 @@ void ChercherBalle()
             PID(vitesse,digitalRead(pinCapteurMilieu),(digitalRead(pinCapteurGauche)+digitalRead(pinCapteurDroit)));
         }
         
-
-        PIDAvancer(vitesse,vitesse,(44.58+20,32),0);
+        //avancer jusqu'au mur et prendre la ball en meme temps
+        PIDAvancer(vitesse,vitesse,64.9,0);
  
+        //prendre la balle
+        PinceClose();
+
+        //demi tour
+        TournerSurPlace(180,vitesse);
+
+        //avancer jusqu'a la ligne et meme la deplacer
+        PIDAvancer(vitesse,vitesse,66,0);
+
+        //suiveur de ligne
+        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
+        {
+            PID(vitesse,digitalRead(pinCapteurMilieu),(digitalRead(pinCapteurGauche)+digitalRead(pinCapteurDroit)));
+        }
+
+        //avancer jusqu'a la ligne et meme la deplacer
+        PIDAvancer(vitesse,vitesse,5,0);
+
+        //ouvrir la pince
+        PinceOpen();
+
         break;
     case 2:
         break;

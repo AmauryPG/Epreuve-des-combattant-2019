@@ -4,11 +4,14 @@ void setup()
 {
   BoardInit();
 
+  PinceOpen();
+
   Serial.begin(9600);  
 }
 
 void loop()
 { 
-  PIDAcceleration(0,0.5,10);
+  
+  ChercherBalle(1);
   delay(10);
 }

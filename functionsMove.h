@@ -8,3 +8,5 @@ void PIDAvancer(float vitesseInitial, float vitesseFinale, float distanceCM, flo
 void PIDAcceleration(float vitesseInitial, float vitesseFinale, float distanceCM);
 
 void TournerSurPlace(float angleEnDegreCercle, float vitesse);
+
+void ChercherBalle(int zone);
