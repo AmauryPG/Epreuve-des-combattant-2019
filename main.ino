@@ -6,6 +6,10 @@ void setup()
 
   PinceOpen();
 
+  pinMode(pinCapteurMilieu,OUTPUT);
+  pinMode(pinCapteurGauche,OUTPUT);
+  pinMode(pinCapteurDroit,OUTPUT);
+
   Serial.begin(9600);  
 }
 
