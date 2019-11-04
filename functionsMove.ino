@@ -151,7 +151,57 @@ void ChercherBalle(int zone)
     switch (zone)
     {
     case 0:
+        //tourner 90 degre gauche
+        TournerSurPlace(-90,vitesse);
 
+        //avancer jusqu'a la ligne
+        PIDAcceleration(0,vitesse,5);
+        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
+        {
+            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
+        }
+
+        //tourner 90 degre droite
+        TournerSurPlace(90,vitesse);
+
+        //avancer jusqu'a la ligne
+        PIDAcceleration(0,vitesse,5);
+        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
+        {
+            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
+        }
+        
+        //suiveur de ligne
+        PIDSuiveurLigne(vitesse);
+        
+        //avancer jusqu'au mur et prendre la ball en meme temps
+        PIDAvancer(vitesse,vitesse,64.9,0);
+ 
+        //prendre la balle
+        PinceClose();
+
+        /**************************************ramenez la balle au centre**************************************/
+        
+        //reculer assez pour faire demi-tour
+        PIDAcceleration(0,-vitesse,15);
+
+        //demi tour
+        TournerSurPlace(180,vitesse);
+
+        //avancer jusqu'a la ligne et meme la deplacer
+        PIDAvancer(vitesse,vitesse,66,0);
+
+        //suiveur de ligne
+        PIDSuiveurLigne(vitesse);
+
+        //avancer jusqu'a la ligne et meme la deplacer
+        PIDAvancer(vitesse,vitesse,5,0);
+
+        //ouvrir la pince
+        PinceOpen();
+
+        //reculer pour faire place au prochain robot
+        PIDAcceleration(0,-vitesse,15);
         break;
     case 1:
         //tourner 90 degre
@@ -205,11 +255,92 @@ void ChercherBalle(int zone)
 
         //reculer pour faire place au prochain robot
         PIDAcceleration(0,-vitesse,15);
-
         break;
     case 2:
+        //tourner 90 degre gauche
+        TournerSurPlace(-90,vitesse);
+
+        //avancer jusqu'a la ligne 
+        PIDAcceleration(0,vitesse,5);
+        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
+        {
+            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
+        }
+
+        //suiveur de ligne
+        PIDSuiveurLigne(vitesse);
+
+        //avancer jusqu'au mur et prendre la ball en meme temps
+        PIDAvancer(vitesse,vitesse,64.9,0);
+ 
+        //prendre la balle
+        PinceClose();
+
+        /**************************************ramenez la balle au centre**************************************/
+        
+        //reculer assez pour faire demi-tour
+        PIDAcceleration(0,-vitesse,15);
+
+        //demi tour
+        TournerSurPlace(180,vitesse);
+
+        //avancer jusqu'a la ligne et meme la deplacer
+        PIDAvancer(vitesse,vitesse,66,0);
+
+        //suiveur de ligne
+        PIDSuiveurLigne(vitesse);
+
+        //avancer jusqu'a la ligne et meme la deplacer
+        PIDAvancer(vitesse,vitesse,5,0);
+
+        //ouvrir la pince
+        PinceOpen();
+
+        //reculer pour faire place au prochain robot
+        PIDAcceleration(0,-vitesse,15);
         break;
     case 3:
+        //tourner 90 degre droite
+        TournerSurPlace(90,vitesse);
+
+        //avancer jusqu'a la ligne 
+        PIDAcceleration(0,vitesse,5);
+        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
+        {
+            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
+        }
+
+        //suiveur de ligne
+        PIDSuiveurLigne(vitesse);
+
+        //avancer jusqu'au mur et prendre la ball en meme temps
+        PIDAvancer(vitesse,vitesse,64.9,0);
+ 
+        //prendre la balle
+        PinceClose();
+
+        /**************************************ramenez la balle au centre**************************************/
+        
+        //reculer assez pour faire demi-tour
+        PIDAcceleration(0,-vitesse,15);
+
+        //demi tour
+        TournerSurPlace(180,vitesse);
+
+        //avancer jusqu'a la ligne et meme la deplacer
+        PIDAvancer(vitesse,vitesse,66,0);
+
+        //suiveur de ligne
+        PIDSuiveurLigne(vitesse);
+
+        //avancer jusqu'a la ligne et meme la deplacer
+        PIDAvancer(vitesse,vitesse,5,0);
+
+        //ouvrir la pince
+        PinceOpen();
+
+        //reculer pour faire place au prochain robot
+        PIDAcceleration(0,-vitesse,15);
         break;
     }
 }
