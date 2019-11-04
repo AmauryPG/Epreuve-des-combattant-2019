@@ -182,3 +182,101 @@ void ChercherBalle()
         break;
     }
 }
+
+// Fonction permettant de suivre une ligne
+//Besoin d'être plus délicate
+int SuiveurLigne(int lastRecord) 
+{
+    int caseRecorded=0;
+
+    switch (Conv_DigitalAnalog())
+    {
+    case 0:
+        MOTOR_SetSpeed(moteurDroit, vitesseNormale);
+        MOTOR_SetSpeed(moteurGauche, vitesseNormale);
+        caseRecorded=0;
+        break;
+
+    case 2:
+        MOTOR_SetSpeed(moteurDroit, vitesseNormale);
+        MOTOR_SetSpeed(moteurGauche, vitesseLente);
+        caseRecorded=2;
+        //Serial.println("case 2");
+        break;
+    case 4:
+        MOTOR_SetSpeed(moteurDroit, vitesseNormale);
+        MOTOR_SetSpeed(moteurGauche, vitesseLente);
+        caseRecorded=4;
+        //Serial.println("case 4");
+        break;
+    case 6:
+        MOTOR_SetSpeed(moteurDroit, vitesseNormale);
+        MOTOR_SetSpeed(moteurGauche, vitesseLente);
+        caseRecorded=6;
+        //Serial.println("case 6");
+        break;
+    case 8:
+        MOTOR_SetSpeed(moteurGauche, vitesseNormale);
+        MOTOR_SetSpeed(moteurDroit, vitesseLente);
+        caseRecorded=8;
+        //Serial.println("case 8");
+        break;
+    case 12:
+        MOTOR_SetSpeed(moteurGauche, vitesseNormale);
+        MOTOR_SetSpeed(moteurDroit, vitesseLente);
+        caseRecorded=12;
+        //Serial.println("case 12");
+        break;
+    case 14:
+        MOTOR_SetSpeed(moteurDroit, 0);
+        MOTOR_SetSpeed(moteurGauche, 0);
+        caseRecorded=14;
+        //Serial.println("case 14");
+        break;
+
+    default:
+            switch (lastRecord)
+            {
+            case 0:
+                MOTOR_SetSpeed(moteurDroit, vitesseNormale);
+                MOTOR_SetSpeed(moteurGauche, vitesseNormale);
+                caseRecorded=0;
+                break;
+            case 2:
+                MOTOR_SetSpeed(moteurDroit, vitesseNormale);
+                MOTOR_SetSpeed(moteurGauche, vitesseLente);
+                //Serial.println("case 2");
+                break;
+            case 4:
+                MOTOR_SetSpeed(moteurDroit, vitesseNormale);
+                MOTOR_SetSpeed(moteurGauche, vitesseLente);
+                //Serial.println("case 4");
+                break;
+            case 6:
+                MOTOR_SetSpeed(moteurDroit, vitesseNormale);
+                MOTOR_SetSpeed(moteurGauche, vitesseLente);
+                //Serial.println("case 6");
+                break;
+            case 8:
+                MOTOR_SetSpeed(moteurGauche, vitesseNormale);
+                MOTOR_SetSpeed(moteurDroit, vitesseLente);
+                //Serial.println("case 8");
+                break;
+            case 12:
+                MOTOR_SetSpeed(moteurGauche, vitesseNormale);
+                MOTOR_SetSpeed(moteurDroit, vitesseLente);
+                //Serial.println("case 12");
+                break;
+            case 14:
+                MOTOR_SetSpeed(moteurDroit, 0);
+                MOTOR_SetSpeed(moteurGauche, 0);
+                //Serial.println("case 14");
+                break;
+            /*MOTOR_SetSpeed(moteurDroit, vitesseNormale);
+            MOTOR_SetSpeed(moteurGauche, vitesseNormale);
+            //Serial.println("Default Value_SumCapteur");
+            break;*/
+            }
+    }
+    return caseRecorded;
+}
