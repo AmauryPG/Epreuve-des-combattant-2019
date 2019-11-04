@@ -78,7 +78,6 @@ void PID(double vitesse, double setPoint, double variable)
     delay(5); //delay for the motors
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////ERREUR DE DIMENSION
 void PIDAcceleration(float vitesseInitial, float vitesseFinale, float distanceCM)
 {
     /****
