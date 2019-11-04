@@ -91,14 +91,12 @@ void PIDAcceleration(float vitesseInitial, float vitesseFinale, float distanceCM
     float constante = ((-24.5407)/(distanceCM - 100.408)) + 48.8973;
     float acceleration = constante *((pow(vitesseFinale, 2) - pow(vitesseInitial, 2)) / (2 * getDistanceEncodeur(distanceCM)));
     int temps = 1;
-    float vitesseModifier = vitesseInitial + acceleration * temps;
+    float vitesseModifier = vitesseInitial + acceleration;
 
     while (vitesseModifier <= vitesseFinale)
     {
         //moteur droit est slave et gauche est master
         PID(vitesseModifier, ENCODER_Read(moteurGauche), ENCODER_Read(moteurDroit));
-
-        //Serial.println(vitesseModifier,7);
 
         temps++;
         vitesseModifier = vitesseInitial + acceleration * temps;
@@ -129,6 +127,15 @@ void PinceClose()
   delay(10);
   SERVO_SetAngle(1, 145);
   delay(10);
+}
+
+///////////////////////////////////////////////////////////////////////////////////reste a tester
+void PIDSuiveurLigne(float vitesse)
+{
+    while(digitalRead(pinCapteurGauche) || digitalRead(pinCapteurMilieu) || digitalRead(pinCapteurDroit))
+    {
+        PID(vitesse,digitalRead(pinCapteurMilieu),(2*digitalRead(pinCapteurGauche)+4*digitalRead(pinCapteurDroit)));
+    } 
 }
 
 /****************************************************************************************
@@ -168,16 +175,18 @@ void ChercherBalle(int zone)
         }
         
         //suiveur de ligne
-        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
-        {
-            PID(vitesse,digitalRead(pinCapteurMilieu),(digitalRead(pinCapteurGauche)+digitalRead(pinCapteurDroit)));
-        }
+        PIDSuiveurLigne(vitesse);
         
         //avancer jusqu'au mur et prendre la ball en meme temps
         PIDAvancer(vitesse,vitesse,64.9,0);
  
         //prendre la balle
         PinceClose();
+
+        /**************************************ramenez la balle au centre**************************************/
+        
+        //reculer assez pour faire demi-tour
+        PIDAcceleration(0,-vitesse,15);
 
         //demi tour
         TournerSurPlace(180,vitesse);
@@ -186,16 +195,16 @@ void ChercherBalle(int zone)
         PIDAvancer(vitesse,vitesse,66,0);
 
         //suiveur de ligne
-        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
-        {
-            PID(vitesse,digitalRead(pinCapteurMilieu),(digitalRead(pinCapteurGauche)+digitalRead(pinCapteurDroit)));
-        }
+        PIDSuiveurLigne(vitesse);
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,5,0);
 
         //ouvrir la pince
         PinceOpen();
+
+        //reculer pour faire place au prochain robot
+        PIDAcceleration(0,-vitesse,15);
 
         break;
     case 2:
