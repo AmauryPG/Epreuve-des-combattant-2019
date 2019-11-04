@@ -4,6 +4,10 @@ void setup()
 {
   BoardInit();
 
+  pinMode(pinCapteurMilieu,OUTPUT);
+  pinMode(pinCapteurDroit,OUTPUT);
+  pinMode(pinCapteurGauche,OUTPUT);
+
   Serial.begin(9600);  
 }
 

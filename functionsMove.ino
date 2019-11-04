@@ -135,49 +135,144 @@ void PinceClose()
 /****************************************************************************************
  *                              fonctions principaux
 ****************************************************************************************/
-void ChercherBalle()
+void porterBalle(int zone)
 {
     //distribution des zones
     //0         1
     //   robot
     //2         3
 
-    switch (zones)
+    /**************************************Aller chercher la balle au centre**************************************/
+    //aller assez lentement pour pas pousser la balle
+    PIDAvancer(0,0.2,10,5);
+
+    //attraper la balle
+    PinceClose();
+    
+    /********************************************Aller porter la balle********************************************/
+    switch (zone)
     {
     case 0:
-
-        break;
-    case 1:
-        //tourner 90 degre
-        TournerSurPlace(90,vitesse);
-
-        //avancer jusqu'a la ligne
-        PIDAcceleration(0,vitesse,5);
-        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
-        {
-            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
-        }
-
-        //tourner 90 degre
+    //avancer assez pour eviter la zone noir
+        PIDAvancer(0,vitesse,10,5);
+        
+        //tourner a gauche
         TournerSurPlace(-90,vitesse);
 
         //avancer jusqu'a la ligne
-        PIDAcceleration(0,vitesse,5);
-        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
+        while(!digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit))
         {
             PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
         }
-        
+
         //suiveur de ligne
-        while(!digitalRead(pinCapteurGauche) && !digitalRead(pinCapteurMilieu) && !digitalRead(pinCapteurDroit))
+        /***************************************************/
+
+        //foncer dans le mur 
+        /**************verifier la distance*****************/
+        PIDAvancer(vitesse,vitesse,30,0);
+
+        //relacher la balle
+        PinceOpen();
+
+        //reculer de la zone
+        PIDAvancer(0,-vitesse,10,0);
+        break;
+    case 1:
+        //avancer assez pour eviter la zone noir
+        PIDAvancer(0,vitesse,10,5);
+        
+        //tourner a droit
+        TournerSurPlace(90,vitesse);
+
+        //avancer jusqu'a la ligne
+        while(!digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit))
         {
-            PID(vitesse,digitalRead(pinCapteurMilieu),(digitalRead(pinCapteurGauche)+digitalRead(pinCapteurDroit)));
+            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
         }
- 
+
+        //suiveur de ligne
+        /***************************************************/
+
+        //foncer dans le mur 
+        /**************verifier la distance*****************/
+        PIDAvancer(vitesse,vitesse,30,0);
+
+        //relacher la balle
+        PinceOpen();
+
+        //reculer de la zone
+        PIDAvancer(0,-vitesse,10,0);
         break;
     case 2:
+        //avancer assez pour eviter la zone noir
+        PIDAvancer(0,vitesse,5,3);
+        
+        //tourner a gauche
+        TournerSurPlace(-90,vitesse);
+
+        //avancer jusqu'a la ligne
+        while(!digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit))
+        {
+            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
+        }
+
+        //tourner a gauche
+        TournerSurPlace(-90,vitesse);
+        
+        //avancer jusqu'a la ligne
+        while(!digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit))
+        {
+            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
+        }
+
+        //suiveur de ligne
+        /***************************************************/
+
+        //foncer dans le mur 
+        /**************verifier la distance*****************/
+        PIDAvancer(vitesse,vitesse,30,0);
+
+        //relacher la balle
+        PinceOpen();
+
+        //reculer de la zone
+        PIDAvancer(0,-vitesse,10,0);
         break;
-    case 3:
+    case 3:     
+       //avancer assez pour eviter la zone noir
+        PIDAvancer(0,vitesse,5,3);
+        
+        //tourner a droit
+        TournerSurPlace(90,vitesse);
+
+        //avancer jusqu'a la ligne
+        while(!digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit))
+        {
+            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
+        }
+
+        //tourner a droit
+        TournerSurPlace(90,vitesse);
+        
+        //avancer jusqu'a la ligne
+        while(!digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit))
+        {
+            PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
+        }
+
+        //suiveur de ligne
+        /***************************************************/
+
+        //foncer dans le mur 
+        /**************verifier la distance*****************/
+        PIDAvancer(vitesse,vitesse,30,0);
+
+        //relacher la balle
+        PinceOpen();
+
+        //reculer de la zone
+        PIDAvancer(0,-vitesse,10,0);
         break;
     }
 }
