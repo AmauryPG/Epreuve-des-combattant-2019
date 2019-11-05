@@ -229,8 +229,8 @@ void porterBalle(int zone)
     //avancer assez pour eviter la zone noir
         PIDAvancer(0,vitesse,10,5);
         
-        //tourner a gauche
-        TournerSurPlace(-90,vitesse);
+        //tourner a gauche 
+        TournerSurPlace(90, gauche, vitesse);
 
         //avancer jusqu'a la ligne
         while(!digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit))
@@ -256,7 +256,7 @@ void porterBalle(int zone)
         PIDAvancer(0,vitesse,10,5);
         
         //tourner a droit
-        TournerSurPlace(90,vitesse);
+        TournerSurPlace(90, droit, vitesse);
 
         //avancer jusqu'a la ligne
         while(!digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit))
@@ -282,7 +282,7 @@ void porterBalle(int zone)
         PIDAvancer(0,vitesse,5,3);
         
         //tourner a gauche
-        TournerSurPlace(-90,vitesse);
+        TournerSurPlace(90, gauche, vitesse);
 
         //avancer jusqu'a la ligne
         while(!digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit))
@@ -291,7 +291,7 @@ void porterBalle(int zone)
         }
 
         //tourner a gauche
-        TournerSurPlace(-90,vitesse);
+        TournerSurPlace(90, gauche, vitesse);
         
         //avancer jusqu'a la ligne
         while(!digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit))
@@ -317,7 +317,7 @@ void porterBalle(int zone)
         PIDAvancer(0,vitesse,5,3);
         
         //tourner a droit
-        TournerSurPlace(90,vitesse);
+        TournerSurPlace(90, droit, vitesse);
 
         //avancer jusqu'a la ligne
         while(!digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit))
@@ -326,7 +326,7 @@ void porterBalle(int zone)
         }
 
         //tourner a droit
-        TournerSurPlace(90,vitesse);
+        TournerSurPlace(90, droit, vitesse);
         
         //avancer jusqu'a la ligne
         while(!digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit) && !digitalRead(pinCapteurDroit))
