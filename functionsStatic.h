@@ -8,5 +8,8 @@
 #define pinCapteurMilieu 22
 #define pinCapteurDroit 26
 
+#define gauche 0
+#define droit 1
+
 int getDistanceEncodeur(float distanceEnCM);
 int getAngleEncodeur(float angleEnDegre); 

@@ -1,7 +1,5 @@
 #include "functionsMove.h"
 
-int zones = 0;
-
 //               pour le robot A
 double kp = 0.001;
 double ki = 0.000002;
@@ -20,32 +18,100 @@ float vitesse = 0.5;
 ////////////////////////////////////////fonction action////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-//tourne sur place avec un angle et une vitesse
-void TournerSurPlace(float angleEnDegreCercle, float vitesse)
+int CM_to_pulse(float distance_en_cm)
 {
-    int moteur1 = moteurDroit;
-    int moteur2 = moteurGauche;
-    int direction = 1;
+  int pulse = ((3200 * distance_en_cm)/(7.8 * PI))+30;
+  return pulse;
+}
 
-    if (angleEnDegreCercle < 0)
+int distance_virage(float angle_en_degre, int virage)
+{
+  int pulse;
+  if (virage == gauche)
+  {
+    float arc = ((angle_en_degre * PI * 18.0) / 360.0) + 2.3;
+    pulse = CM_to_pulse(arc);
+  }
+  else if (virage == droit)
+  {
     {
-        moteur1 = moteurGauche;
-        moteur2 = moteurDroit;
-        direction = -1;
+      float arc = ((angle_en_degre * PI * 18.0) / 360.0) + 3;
+      pulse = CM_to_pulse(arc);
     }
+  }
+  return pulse;
+}
 
-    //set distance en encodeur
-    int angleEncodeur = getAngleEncodeur(angleEnDegreCercle);
-
-    //avance les deux moteurs
-    while (direction * angleEncodeur >= ENCODER_Read(moteur1) && direction * -angleEncodeur <= ENCODER_Read(moteur2))
+//tourne sur place avec un angle et une vitesse
+void TournerSurPlace(float angle_en_degre, int virage, float vitesse)
+{
+  float pulse;
+  ENCODER_ReadReset(0);
+  ENCODER_ReadReset(1);
+  if (virage == gauche)
+  {
+    pulse = distance_virage(angle_en_degre, gauche);
+    while (abs(ENCODER_Read(1)) < pulse && abs(ENCODER_Read(0)) < pulse)
     {
-        MOTOR_SetSpeed(moteur1, vitesse);
-        MOTOR_SetSpeed(moteur2, -vitesse);
+      MOTOR_SetSpeed(0, -vitesse);
+      MOTOR_SetSpeed(1, vitesse); 
     }
-    //reset et arrete les moteurs avec un delay
-    MOTOR_SetSpeed(moteur1, 0);
-    MOTOR_SetSpeed(moteur2, 0);
+    MOTOR_SetSpeed(1, 0);
+    MOTOR_SetSpeed(0,0);
+  }
+  else if (virage == droit)
+  {
+    pulse = distance_virage(angle_en_degre, droit);
+    while (abs(ENCODER_Read(0)) < pulse && ENCODER_Read(1) < pulse)
+    {
+      MOTOR_SetSpeed(0, vitesse);
+      MOTOR_SetSpeed(1, -vitesse);
+    }
+    MOTOR_SetSpeed(1, 0);
+    MOTOR_SetSpeed(0,0);
+  }
+}
+
+int Conv_DigitalAnalog() // Conversion Digital -> Analog
+{ 
+    return 2 * digitalRead(pinCapteurGauche) + 4 * digitalRead(pinCapteurMilieu) + 8 * digitalRead(pinCapteurDroit);
+}
+
+void SuiveurLigne() // Prototype #1 du suiveur de ligne
+{
+    switch (Conv_DigitalAnalog())
+    {
+    case 2:
+        MOTOR_SetSpeed(moteurDroit, -0.6);
+        MOTOR_SetSpeed(moteurGauche, -0.3); 
+        break;
+    case 4:
+        MOTOR_SetSpeed(moteurDroit, -0.6);
+        MOTOR_SetSpeed(moteurGauche, -0.6); 
+        break;
+    case 6:
+        MOTOR_SetSpeed(moteurDroit, -0.6);
+        MOTOR_SetSpeed(moteurGauche, -0.4); 
+        break;
+    case 8:
+        MOTOR_SetSpeed(moteurGauche, -0.6);
+        MOTOR_SetSpeed(moteurDroit, -0.3); 
+        break;
+    case 12:
+        MOTOR_SetSpeed(moteurGauche, -0.6);
+        MOTOR_SetSpeed(moteurDroit, -0.4); 
+        break;
+    case 14:
+        MOTOR_SetSpeed(moteurDroit, 0);
+        MOTOR_SetSpeed(moteurGauche, 0); 
+
+        break;
+
+    default:
+        MOTOR_SetSpeed(moteurDroit, -0.2);
+        MOTOR_SetSpeed(moteurGauche, -0.2); 
+        break;
+    }
 }
 
 //*********************************************************************************************************
@@ -92,14 +158,12 @@ void PIDAcceleration(float vitesseInitial, float vitesseFinale, float distanceCM
     float constante = ((-24.5407)/(distanceCM - 100.408)) + 48.8973;
     float acceleration = constante *((pow(vitesseFinale, 2) - pow(vitesseInitial, 2)) / (2 * getDistanceEncodeur(distanceCM)));
     int temps = 1;
-    float vitesseModifier = vitesseInitial + acceleration * temps;
+    float vitesseModifier = vitesseInitial + acceleration;
 
     while (vitesseModifier <= vitesseFinale)
     {
         //moteur droit est slave et gauche est master
         PID(vitesseModifier, ENCODER_Read(moteurGauche), ENCODER_Read(moteurDroit));
-
-        //Serial.println(vitesseModifier,7);
 
         temps++;
         vitesseModifier = vitesseInitial + acceleration * temps;
@@ -130,6 +194,15 @@ void PinceClose()
   delay(10);
   SERVO_SetAngle(1, 145);
   delay(10);
+}
+
+///////////////////////////////////////////////////////////////////////////////////reste a tester
+void PIDSuiveurLigne(float vitesse)
+{
+    while(digitalRead(pinCapteurGauche) || digitalRead(pinCapteurMilieu) || digitalRead(pinCapteurDroit))
+    {
+        PID(vitesse,digitalRead(pinCapteurMilieu),(2*digitalRead(pinCapteurGauche)+4*digitalRead(pinCapteurDroit)));
+    } 
 }
 
 /****************************************************************************************
