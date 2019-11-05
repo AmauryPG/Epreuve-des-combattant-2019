@@ -46,6 +46,48 @@ void TournerSurPlace(float angleEnDegreCercle, float vitesse)
     MOTOR_SetSpeed(moteur2, 0);
 }
 
+int Conv_DigitalAnalog() // Conversion Digital -> Analog
+{ 
+    return 2 * digitalRead(pinCapteurGauche) + 4 * digitalRead(pinCapteurMilieu) + 8 * digitalRead(pinCapteurDroit);
+}
+
+void SuiveurLigne() // Prototype #1 du suiveur de ligne
+{
+    switch (Conv_DigitalAnalog())
+    {
+    case 2:
+        MOTOR_SetSpeed(moteurDroit, -0.6);
+        MOTOR_SetSpeed(moteurGauche, -0.3); 
+        break;
+    case 4:
+        MOTOR_SetSpeed(moteurDroit, -0.6);
+        MOTOR_SetSpeed(moteurGauche, -0.6); 
+        break;
+    case 6:
+        MOTOR_SetSpeed(moteurDroit, -0.6);
+        MOTOR_SetSpeed(moteurGauche, -0.4); 
+        break;
+    case 8:
+        MOTOR_SetSpeed(moteurGauche, -0.6);
+        MOTOR_SetSpeed(moteurDroit, -0.3); 
+        break;
+    case 12:
+        MOTOR_SetSpeed(moteurGauche, -0.6);
+        MOTOR_SetSpeed(moteurDroit, -0.4); 
+        break;
+    case 14:
+        MOTOR_SetSpeed(moteurDroit, 0);
+        MOTOR_SetSpeed(moteurGauche, 0); 
+
+        break;
+
+    default:
+        MOTOR_SetSpeed(moteurDroit, -0.2);
+        MOTOR_SetSpeed(moteurGauche, -0.2); 
+        break;
+    }
+}
+
 //*********************************************************************************************************
 //                                             PID general
 //                                            *Pas toucher*
@@ -172,7 +214,7 @@ void ChercherBalle(int zone)
         }
         
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
         
         //avancer jusqu'au mur et prendre la ball en meme temps
         PIDAvancer(vitesse,vitesse,64.9,0);
@@ -192,7 +234,7 @@ void ChercherBalle(int zone)
         PIDAvancer(vitesse,vitesse,66,0);
 
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,5,0);
@@ -225,7 +267,7 @@ void ChercherBalle(int zone)
         }
         
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
         
         //avancer jusqu'au mur et prendre la ball en meme temps
         PIDAvancer(vitesse,vitesse,64.9,0);
@@ -245,7 +287,7 @@ void ChercherBalle(int zone)
         PIDAvancer(vitesse,vitesse,66,0);
 
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,5,0);
@@ -268,7 +310,7 @@ void ChercherBalle(int zone)
         }
 
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
 
         //avancer jusqu'au mur et prendre la ball en meme temps
         PIDAvancer(vitesse,vitesse,64.9,0);
@@ -288,7 +330,7 @@ void ChercherBalle(int zone)
         PIDAvancer(vitesse,vitesse,66,0);
 
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,5,0);
@@ -311,7 +353,7 @@ void ChercherBalle(int zone)
         }
 
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
 
         //avancer jusqu'au mur et prendre la ball en meme temps
         PIDAvancer(vitesse,vitesse,64.9,0);
@@ -331,7 +373,7 @@ void ChercherBalle(int zone)
         PIDAvancer(vitesse,vitesse,66,0);
 
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,5,0);

@@ -11,3 +11,6 @@ void PIDSuiveurLigne(float vitesse);
 void TournerSurPlace(float angleEnDegreCercle, float vitesse);
 
 void ChercherBalle(int zone);
+
+void SuiveurLigne();
+int Conv_DigitalAnalog();
