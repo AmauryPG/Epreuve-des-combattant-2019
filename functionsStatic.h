@@ -9,7 +9,7 @@
 #define pinCapteurDroit 26
 
 #define vitesseNormale -0.3
-#define vitesseLente -0.2
+#define vitesseLente -0.1
 #define vitesseLentePlus -0.1
 
 

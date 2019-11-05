@@ -15,7 +15,6 @@ void loop()
   delay(5000);
   delay(10);*/
 
-  int lastCase;
-  lastCase = SuiveurLigne(lastCase);
-  delay(100);
+  SuiveurLigne();
+  delay(50);
 }

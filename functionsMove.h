@@ -9,4 +9,4 @@ void PIDAcceleration(float vitesseInitial, float vitesseFinale, float distanceCM
 
 void TournerSurPlace(float angleEnDegreCercle, float vitesse);
 
-int SuiveurLigne(int lastRecorded);
+void SuiveurLigne();
