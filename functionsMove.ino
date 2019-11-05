@@ -18,32 +18,100 @@ float vitesse = 0.5;
 ////////////////////////////////////////fonction action////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-//tourne sur place avec un angle et une vitesse
-void TournerSurPlace(float angleEnDegreCercle, float vitesse)
+int CM_to_pulse(float distance_en_cm)
 {
-    int moteur1 = moteurDroit;
-    int moteur2 = moteurGauche;
-    int direction = 1;
+  int pulse = ((3200 * distance_en_cm)/(7.8 * PI))+30;
+  return pulse;
+}
 
-    if (angleEnDegreCercle < 0)
+int distance_virage(float angle_en_degre, int virage)
+{
+  int pulse;
+  if (virage == gauche)
+  {
+    float arc = ((angle_en_degre * PI * 18.0) / 360.0) + 2.3;
+    pulse = CM_to_pulse(arc);
+  }
+  else if (virage == droit)
+  {
     {
-        moteur1 = moteurGauche;
-        moteur2 = moteurDroit;
-        direction = -1;
+      float arc = ((angle_en_degre * PI * 18.0) / 360.0) + 3;
+      pulse = CM_to_pulse(arc);
     }
+  }
+  return pulse;
+}
 
-    //set distance en encodeur
-    int angleEncodeur = getAngleEncodeur(angleEnDegreCercle);
-
-    //avance les deux moteurs
-    while (direction * angleEncodeur >= ENCODER_Read(moteur1) && direction * -angleEncodeur <= ENCODER_Read(moteur2))
+//tourne sur place avec un angle et une vitesse
+void TournerSurPlace(float angle_en_degre, int virage, float vitesse)
+{
+  float pulse;
+  ENCODER_ReadReset(0);
+  ENCODER_ReadReset(1);
+  if (virage == gauche)
+  {
+    pulse = distance_virage(angle_en_degre, gauche);
+    while (abs(ENCODER_Read(1)) < pulse && abs(ENCODER_Read(0)) < pulse)
     {
-        MOTOR_SetSpeed(moteur1, vitesse);
-        MOTOR_SetSpeed(moteur2, -vitesse);
+      MOTOR_SetSpeed(0, -vitesse);
+      MOTOR_SetSpeed(1, vitesse); 
     }
-    //reset et arrete les moteurs avec un delay
-    MOTOR_SetSpeed(moteur1, 0);
-    MOTOR_SetSpeed(moteur2, 0);
+    MOTOR_SetSpeed(1, 0);
+    MOTOR_SetSpeed(0,0);
+  }
+  else if (virage == droit)
+  {
+    pulse = distance_virage(angle_en_degre, droit);
+    while (abs(ENCODER_Read(0)) < pulse && ENCODER_Read(1) < pulse)
+    {
+      MOTOR_SetSpeed(0, vitesse);
+      MOTOR_SetSpeed(1, -vitesse);
+    }
+    MOTOR_SetSpeed(1, 0);
+    MOTOR_SetSpeed(0,0);
+  }
+}
+
+int Conv_DigitalAnalog() // Conversion Digital -> Analog
+{ 
+    return 2 * digitalRead(pinCapteurGauche) + 4 * digitalRead(pinCapteurMilieu) + 8 * digitalRead(pinCapteurDroit);
+}
+
+void SuiveurLigne() // Prototype #1 du suiveur de ligne
+{
+    switch (Conv_DigitalAnalog())
+    {
+    case 2:
+        MOTOR_SetSpeed(moteurDroit, -0.6);
+        MOTOR_SetSpeed(moteurGauche, -0.3); 
+        break;
+    case 4:
+        MOTOR_SetSpeed(moteurDroit, -0.6);
+        MOTOR_SetSpeed(moteurGauche, -0.6); 
+        break;
+    case 6:
+        MOTOR_SetSpeed(moteurDroit, -0.6);
+        MOTOR_SetSpeed(moteurGauche, -0.4); 
+        break;
+    case 8:
+        MOTOR_SetSpeed(moteurGauche, -0.6);
+        MOTOR_SetSpeed(moteurDroit, -0.3); 
+        break;
+    case 12:
+        MOTOR_SetSpeed(moteurGauche, -0.6);
+        MOTOR_SetSpeed(moteurDroit, -0.4); 
+        break;
+    case 14:
+        MOTOR_SetSpeed(moteurDroit, 0);
+        MOTOR_SetSpeed(moteurGauche, 0); 
+
+        break;
+
+    default:
+        MOTOR_SetSpeed(moteurDroit, -0.2);
+        MOTOR_SetSpeed(moteurGauche, -0.2); 
+        break;
+    }
 }
 
 //*********************************************************************************************************
@@ -152,7 +220,7 @@ void ChercherBalle(int zone)
     {
     case 0:
         //tourner 90 degre gauche
-        TournerSurPlace(-90,vitesse);
+        TournerSurPlace(90,gauche,vitesse);
 
         //avancer jusqu'a la ligne
         PIDAcceleration(0,vitesse,5);
@@ -161,8 +229,8 @@ void ChercherBalle(int zone)
             PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
         }
 
-        //tourner 90 degre droite
-        TournerSurPlace(90,vitesse);
+        //tourner 90 degre droit
+        TournerSurPlace(90,droit,vitesse);
 
         //avancer jusqu'a la ligne
         PIDAcceleration(0,vitesse,5);
@@ -172,7 +240,7 @@ void ChercherBalle(int zone)
         }
         
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
         
         //avancer jusqu'au mur et prendre la ball en meme temps
         PIDAvancer(vitesse,vitesse,64.9,0);
@@ -186,13 +254,13 @@ void ChercherBalle(int zone)
         PIDAcceleration(0,-vitesse,15);
 
         //demi tour
-        TournerSurPlace(180,vitesse);
+        TournerSurPlace(180,droit,vitesse);
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,66,0);
 
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,5,0);
@@ -204,8 +272,8 @@ void ChercherBalle(int zone)
         PIDAcceleration(0,-vitesse,15);
         break;
     case 1:
-        //tourner 90 degre
-        TournerSurPlace(90,vitesse);
+        //tourner 90 degre droit
+        TournerSurPlace(90,droit,vitesse);
 
         //avancer jusqu'a la ligne
         PIDAcceleration(0,vitesse,5);
@@ -214,8 +282,8 @@ void ChercherBalle(int zone)
             PID(vitesse,ENCODER_Read(moteurGauche),ENCODER_Read(moteurDroit));
         }
 
-        //tourner 90 degre
-        TournerSurPlace(-90,vitesse);
+        //tourner 90 degre gauche
+        TournerSurPlace(90,gauche,vitesse);
 
         //avancer jusqu'a la ligne
         PIDAcceleration(0,vitesse,5);
@@ -225,7 +293,7 @@ void ChercherBalle(int zone)
         }
         
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
         
         //avancer jusqu'au mur et prendre la ball en meme temps
         PIDAvancer(vitesse,vitesse,64.9,0);
@@ -238,14 +306,14 @@ void ChercherBalle(int zone)
         //reculer assez pour faire demi-tour
         PIDAcceleration(0,-vitesse,15);
 
-        //demi tour
-        TournerSurPlace(180,vitesse);
+        //demi tour 
+        TournerSurPlace(180,droit,vitesse);
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,66,0);
 
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,5,0);
@@ -258,7 +326,7 @@ void ChercherBalle(int zone)
         break;
     case 2:
         //tourner 90 degre gauche
-        TournerSurPlace(-90,vitesse);
+        TournerSurPlace(90,gauche,vitesse);
 
         //avancer jusqu'a la ligne 
         PIDAcceleration(0,vitesse,5);
@@ -268,7 +336,7 @@ void ChercherBalle(int zone)
         }
 
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
 
         //avancer jusqu'au mur et prendre la ball en meme temps
         PIDAvancer(vitesse,vitesse,64.9,0);
@@ -281,14 +349,14 @@ void ChercherBalle(int zone)
         //reculer assez pour faire demi-tour
         PIDAcceleration(0,-vitesse,15);
 
-        //demi tour
-        TournerSurPlace(180,vitesse);
+        //demi tour 
+        TournerSurPlace(180,gauche,vitesse);
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,66,0);
 
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,5,0);
@@ -300,8 +368,8 @@ void ChercherBalle(int zone)
         PIDAcceleration(0,-vitesse,15);
         break;
     case 3:
-        //tourner 90 degre droite
-        TournerSurPlace(90,vitesse);
+        //tourner 90 degre droit
+        TournerSurPlace(90,droit,vitesse);
 
         //avancer jusqu'a la ligne 
         PIDAcceleration(0,vitesse,5);
@@ -311,7 +379,7 @@ void ChercherBalle(int zone)
         }
 
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
 
         //avancer jusqu'au mur et prendre la ball en meme temps
         PIDAvancer(vitesse,vitesse,64.9,0);
@@ -325,13 +393,13 @@ void ChercherBalle(int zone)
         PIDAcceleration(0,-vitesse,15);
 
         //demi tour
-        TournerSurPlace(180,vitesse);
+        TournerSurPlace(180,droit,vitesse);
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,66,0);
 
         //suiveur de ligne
-        PIDSuiveurLigne(vitesse);
+        SuiveurLigne();
 
         //avancer jusqu'a la ligne et meme la deplacer
         PIDAvancer(vitesse,vitesse,5,0);

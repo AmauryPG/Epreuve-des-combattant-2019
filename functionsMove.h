@@ -8,6 +8,9 @@ void PIDAvancer(float vitesseInitial, float vitesseFinale, float distanceCM, flo
 void PIDAcceleration(float vitesseInitial, float vitesseFinale, float distanceCM);
 void PIDSuiveurLigne(float vitesse);
 
-void TournerSurPlace(float angleEnDegreCercle, float vitesse);
+void TournerSurPlace(float angle_en_degre, int virage, float vitesse);
 
 void ChercherBalle(int zone);
+
+void SuiveurLigne();
+int Conv_DigitalAnalog();
