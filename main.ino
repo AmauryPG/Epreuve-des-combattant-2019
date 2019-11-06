@@ -20,8 +20,8 @@ void setup()
 
 void loop()
 {   
-  TournerSurPlace(180,gauche,0.2);
-  MOTOR_SetSpeed(moteurDroit,0);
-  MOTOR_SetSpeed(moteurGauche,0);
-  delay(500);
+  //porterBalle(0);
+
+  pinceLente(170);
+  delay(1000);
 }
