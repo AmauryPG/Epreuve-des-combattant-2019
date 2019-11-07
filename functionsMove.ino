@@ -20,7 +20,7 @@ int distance_virage(float angle_en_degre, int virage)
     else if (virage == droit)
     {
         {
-            return getDistanceEncodeur(((angle_en_degre * PI * 18.5) / 360.0)- 0.0000109263 * pow(angle_en_degre, 3) + 0.00324679 * pow(angle_en_degre, 2) - 0.25218 * angle_en_degre + 4.91551);
+            return getDistanceEncodeur(((angle_en_degre * PI * 18.5) / 360.0) - 0.0000109263 * pow(angle_en_degre, 3) + 0.00324679 * pow(angle_en_degre, 2) - 0.25218 * angle_en_degre + 4.91551);
         }
     }
 }
@@ -172,12 +172,12 @@ void PIDAvancer(float vitesseInitial, float vitesseFinale, float distanceCM, flo
 
 void PinceOpen()
 {
-    SERVO_SetAngle(pince, 170);
+    SERVO_SetAngle(pince, 40);
 }
 
 void PinceClose()
 {
-    SERVO_SetAngle(pince, 90);
+    SERVO_SetAngle(pince, 110);
 }
 
 void PinceAttraper()
@@ -206,101 +206,239 @@ void PinceLaisseBalle()
 void porterBalle(int zone)
 {
     //distribution des zones
-    //0         1
-    //   robot
     //2         3
+    //   robot
+    //1         0
 
-    /**************************************Aller chercher la balle au centre**************************************/
-    //aller assez lentement pour pas pousser la balle
-    PIDAvancer(0, 0.2, 10, 5);
-
-    //attraper la balle
-    PinceClose();
-
-    /********************************************Aller porter la balle********************************************/
     switch (zone)
     {
     case 0:
-        //tourner sur place 180-arcsin(0.552)
-        TournerSurPlace(146.50, droit, vitesse);
-
-        //avancer jusqu'a la balle
-        PIDAvancer(0, vitesse, 85, 10);
-
-        //attrapper la balle
-        PinceAttraper();
-
-        //demi tour
-        TournerSurPlace(180, droit, vitesse);
-
-        //avancer jusqu'au centre
-        PIDAvancer(0, vitesse, 85, 10);
-
         PinceOpen();
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        TournerSurPlace(108, droit, 0.3);
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        PIDAvancer(0, 0.3, 84, 10);
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        MOTOR_SetSpeed(moteurGauche, 0);
+        MOTOR_SetSpeed(moteurDroit, 0);
+
+        PinceClose();
+
+        delay(800);
+
+        TournerSurPlace(120, droit, 0.3);
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+        delay(100);
+
+        TournerSurPlace(65, droit, 0.3);
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        PIDAvancer(0, 0.3, 89, 15);
+
+        MOTOR_SetSpeed(moteurGauche, 0);
+        MOTOR_SetSpeed(moteurDroit, 0);
+
+        TournerSurPlace(15, droit, 0.3);
+
+        delay(800);
+
+        SERVO_SetAngle(pince, 60);
         break;
     case 1:
-        //tourner sur place 180-arcsin(0.552)
-        TournerSurPlace(146.50, droit, vitesse);
-
-        //avancer jusqu'a la balle
-        PIDAvancer(0, vitesse, 85, 10);
-
-        //attrapper la balle
-        PinceAttraper();
-
-        //demi tour
-        TournerSurPlace(180, droit, vitesse);
-
-        //avancer jusqu'au centre
-        PIDAvancer(0, vitesse, 85, 10);
 
         PinceOpen();
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        TournerSurPlace(90, gauche, 0.3);
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        TournerSurPlace(29, gauche, 0.3);
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        PIDAvancer(0, 0.3, 84, 10);
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        MOTOR_SetSpeed(moteurGauche, 0);
+        MOTOR_SetSpeed(moteurDroit, 0);
+
+        PinceClose();
+
+        delay(800);
+
+        TournerSurPlace(120, gauche, 0.3);
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+        delay(100);
+
+        TournerSurPlace(85, gauche, 0.3);
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        PIDAvancer(0, 0.3, 91, 15);
+
+        MOTOR_SetSpeed(moteurGauche, 0);
+        MOTOR_SetSpeed(moteurDroit, 0);
+
+        TournerSurPlace(15, gauche, 0.3);
+
+        SERVO_SetAngle(pince, 80);
         break;
     case 2:
-        //tourner sur place 180-arcsin(0.552)
-        TournerSurPlace(146.50, droit, vitesse);
+        PinceOpen();
+        //premier virage
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
 
-        //avancer jusqu'a la balle
-        PIDAvancer(0, vitesse, 85, 10);
+        TournerSurPlace(45, gauche, 0.3);
+        //premier trajet
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
 
-        //attrapper la balle
-        PinceAttraper();
+        PIDAvancer(0, 0.3, 70, 10);
+        //deuxieme virage
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
 
-        //demi tour
-        TournerSurPlace(180, droit, vitesse);
+        TournerSurPlace(90, droit, 0.3);
+        //deuxieme trajet
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
 
-        //avancer jusqu'au centre
-        PIDAvancer(0, vitesse, 85, 10);
+        PIDAvancer(0, 0.3, 14, 15);
+        //virage 3
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        TournerSurPlace(98, gauche, 0.3);
+        //troisieme trajet
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        PIDAvancer(0, 0.3, 63, 15);
+
+        MOTOR_SetSpeed(moteurGauche, 0);
+        MOTOR_SetSpeed(moteurDroit, 0);
+
+        PinceClose();
+
+        delay(800);
+        //retour
+        TournerSurPlace(180, gauche, 0.3);
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        PIDAvancer(0, 0.3, 104, 15);
+
+        MOTOR_SetSpeed(moteurGauche, 0);
+        MOTOR_SetSpeed(moteurDroit, 0);
+
+        TournerSurPlace(135, gauche, 0.3);
 
         PinceOpen();
+        for (int i = 0; i < 500; i++)
+        {
+            MOTOR_SetSpeed(moteurDroit, -0.3);
+            MOTOR_SetSpeed(moteurGauche, -0.3);
+        }
+
+        MOTOR_SetSpeed(moteurGauche, 0);
+        MOTOR_SetSpeed(moteurDroit, 0);
         break;
     case 3:
-        //tourner sur place 180-arcsin(0.552)+180
-        TournerSurPlace(326.5, droit, vitesse);
+        PinceOpen();
+        //premier virage
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
 
-        //avancer jusqu'a la balle
-        PIDAvancer(0, vitesse, 85, 10);
+        TournerSurPlace(45, droit, 0.3);
+        //premier trajet
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
 
-        //attrapper la balle
-        PinceAttraper();
+        PIDAvancer(0, 0.3, 50, 10);
+        //deuxieme virage
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
 
-        //demi tour
-        TournerSurPlace(180, droit, vitesse);
+        TournerSurPlace(90, gauche, 0.3);
+        //deuxieme trajet
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
 
-        //avancer jusqu'au centre
-        PIDAvancer(0, vitesse, 85, 10);
+        PIDAvancer(0, 0.3, 20, 15);
+        //virage 3
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        TournerSurPlace(97, droit, 0.3);
+        //troisieme trajet
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        PIDAvancer(0, 0.3, 72, 15);
+
+        MOTOR_SetSpeed(moteurGauche, 0);
+        MOTOR_SetSpeed(moteurDroit, 0);
+
+        PinceClose();
+
+        delay(800);
+        //retour
+        TournerSurPlace(180, droit, 0.3);
+
+        ENCODER_Reset(moteurGauche);
+        ENCODER_Reset(moteurDroit);
+
+        PIDAvancer(0, 0.3, 104, 15);
+
+        MOTOR_SetSpeed(moteurGauche, 0);
+        MOTOR_SetSpeed(moteurDroit, 0);
+
+        TournerSurPlace(135, droit, 0.3);
 
         PinceOpen();
+        for (int i = 0; i < 500; i++)
+        {
+            MOTOR_SetSpeed(moteurDroit, -0.3);
+            MOTOR_SetSpeed(moteurGauche, -0.3);
+        }
+
+        MOTOR_SetSpeed(moteurGauche, 0);
+        MOTOR_SetSpeed(moteurDroit, 0);
         break;
     }
 }
 
-void pinceLente(int angle){
+void pinceLente(int angle)
+{
 
-
-    for(int i = 0; i <= angle; i += angle/100){
+    for (int i = 0; i <= angle; i += angle / 100)
+    {
         SERVO_SetAngle(pince, i);
         delay(500);
     }
-
 }
